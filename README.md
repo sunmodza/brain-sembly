@@ -1,6 +1,7 @@
 # brain-sembly
 
 ### This project is a programming language that will be compiled into Brainfuck. Actually, I don't even know how it will be used.
+### Feel free contributing to this. Try reading the source code to understand how it works or find a way to ask me.
 
 ## More info update later
 

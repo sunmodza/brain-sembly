@@ -76,3 +76,10 @@ class ACMPB(Register):
 
 class ACMPC(Register):
     name = "ACMPC"
+
+class ACMPD(Register):
+    name = "ACMPD"
+
+
+class IFZ(Register):
+    name = "IFZ"

@@ -270,3 +270,15 @@ class CLTZERO(Command):
 
     def eval(self):
         pass
+
+
+class IFZERO(Command):
+    name = "IFZERO"
+    args_count = 0
+
+    def eval(self):
+        base = self.master.ptr
+        self.master.execute_command("PT ACMPA")
+        self.master.apply("[[->+<]>>-<<]>>+<[-<+>]<[-]")
+        self.master.execute_command(f"PT {base}")
+        return ""

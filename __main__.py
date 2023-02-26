@@ -1,7 +1,7 @@
 from brainf import BrainF,opti_brain
 
 
-d = BrainF(10)
+d = BrainF(5)
 d.execute_command("INPUT")
 d.execute_command("PT IX")
 d.execute_command("MOV 0")

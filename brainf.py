@@ -1,7 +1,10 @@
 from __future__ import annotations
 from typing import List, Literal, Tuple, Union, Dict
-from memory import MemoryUnit, PX, AX, BX, CX, DX, CBAR, IX, APX, BPX, CPX, DPX, ZERO, IFA, ACMPA, ACMPB, ACMPC, IFZ, ACMPD
-from command import PT, RST, MOV, CPY, INPUT, OUTPUT, ADDN, ADDV, SUBN, SUBV, SETN, RAPX, IFZERO, opti_brain
+from command import Command, opti_brain
+from memory import MemoryUnit
+import inspect
+import command
+import memory
 
 
 class BrainF:
@@ -9,11 +12,10 @@ class BrainF:
         self._command = ""
         self.memory = []
         self.ptr = 0
-        self.registers = [PX(), AX(), BX(), CX(), DX(), CBAR(),
-                          IX(), APX(), BPX(), CPX(), DPX(), ZERO(), IFA(),
-                          ACMPA(), ACMPB(), ACMPC(), ACMPD(), IFZ()]
-        self.commands = [PT(), RST(), MOV(), CPY(), INPUT(),
-                         OUTPUT(), ADDN(), ADDV(), SUBN(), SUBV(), SETN(), RAPX(), IFZERO()]
+        self.registers: List[MemoryUnit] = [regis() for _, regis in inspect.getmembers(
+            memory, inspect.isclass) if issubclass(regis, MemoryUnit) and regis != MemoryUnit]
+        self.commands: List[Command] = [cmm() for _, cmm in inspect.getmembers(
+            command, inspect.isclass) if issubclass(cmm, Command) and cmm != Command]
         self.create_memory(size)
         self.set_command_master()
 

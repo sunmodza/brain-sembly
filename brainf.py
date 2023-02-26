@@ -57,3 +57,7 @@ class BrainF:
         if src > dest:
             return "<", dist, dest-src
         return ">", dist, dest-src
+    
+    @property
+    def command(self):
+        return opti_brain(self._command)

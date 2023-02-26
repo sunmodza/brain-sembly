@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, List, Union, Dict
+import re
 
 if TYPE_CHECKING:
     from brainf import BrainF
@@ -16,6 +17,13 @@ def opti_brain(command: str):
     while "><" in command:
         command = command.replace("><", "")
     return command
+
+
+def remove_nested_square_brackets(text):
+    pattern = r'\[[^\[\]]*\]'
+    while re.search(pattern, text):
+        text = re.sub(pattern, '', text)
+    return text
 
 
 class Command:
@@ -281,4 +289,54 @@ class IFZERO(Command):
         self.master.execute_command("PT ACMPA")
         self.master.apply("[[->+<]>>-<<]>>+<[-<+>]<[-]")
         self.master.execute_command(f"PT {base}")
+        return ""
+
+
+class IFSTART(Command):
+    name = "IFSTART"
+    args_count = 0
+
+    def eval(self):
+        base = self.master.ptr
+        self.master.base = base
+        self.master.execute_command("PT ACMPA")
+        self.master.apply("[[-]")
+        self.master.execute_command(f"PT {base}")
+        self.master.apply("V")
+        self.master.execute_command(f"PT ACMPA")
+        self.master.apply("M")
+        self.master.apply("]")
+        self.master.ptr = base
+        return
+
+
+class IFEND(Command):
+    name = "IFEND"
+    args_count = 0
+
+    def after_e(self):
+        pos_start = self.master._command.find("M")+1
+        return self.master._command[pos_start+1:],pos_start-1
+
+    def eval(self):
+        if_command,m_pos = self.after_e()
+
+        removed = remove_nested_square_brackets(if_command)
+        distance = removed.count(">")-removed.count("<")
+
+        sign = ">"
+        if distance < 0:
+            sign = "<"
+
+        distance = abs(distance)
+        extension = sign*distance
+
+        self.master._command = self.master._command[:m_pos]
+
+        self.master.apply(f"{extension}]")
+        self.master._command = self.master._command.replace("V",if_command)
+
+
+        self.master.ptr = self.master.get_memory_location("ACMPA")
+        self.master.execute_command(f"PT {self.master.base}")
         return ""

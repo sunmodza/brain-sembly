@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, List, Union, Dict
 import re
+from memory import Register
 
 if TYPE_CHECKING:
     from brainf import BrainF
@@ -29,10 +30,11 @@ def remove_nested_square_brackets(text):
 class Command:
     name: str
     args_count: int
+    registers : List[Register]
     master: 'BrainF'
 
     def check_n_eval(self, cmm: str):
-        data = cmm.split(" ")
+        data = cmm.split(" ") 
         command_name = data[0]
         args = data[1:]
         phd = []
@@ -316,10 +318,10 @@ class IFEND(Command):
 
     def after_e(self):
         pos_start = self.master._command.find("M")+1
-        return self.master._command[pos_start+1:],pos_start-1
+        return self.master._command[pos_start+1:], pos_start-1
 
     def eval(self):
-        if_command,m_pos = self.after_e()
+        if_command, m_pos = self.after_e()
 
         removed = remove_nested_square_brackets(if_command)
         distance = removed.count(">")-removed.count("<")
@@ -334,9 +336,45 @@ class IFEND(Command):
         self.master._command = self.master._command[:m_pos]
 
         self.master.apply(f"{extension}]")
-        self.master._command = self.master._command.replace("V",if_command)
-
+        self.master._command = self.master._command.replace("V", if_command)
 
         self.master.ptr = self.master.get_memory_location("ACMPA")
         self.master.execute_command(f"PT {self.master.base}")
+        return ""
+
+
+class EQ(Command):
+    name = "EQ"
+    args_count = 0
+
+    def eval(self) -> str:
+        base = self.master.ptr
+        self.master.execute_command("PT ACMPB")
+        self.master.apply("[-<->]")
+        self.master.execute_command("IFZERO")
+        self.master.execute_command(f"PT {base}")
+        return ""
+
+    
+class LT(Command):
+    name = "LT"
+    args_count = 0
+    
+    def eval(self) -> str:
+        base = self.master.ptr
+        self.master.execute_command("PT ACMPA")
+        self.master.apply("[->-<]")
+        self.master.apply(">[[-]>[-]+<]<")
+        self.master.execute_command(f"PT {base}")
+        return ""
+    
+class GT(Command):
+    name = "GT"
+    args_count = 0
+    
+    def eval(self) -> str:
+        base = self.master.ptr
+        self.master.execute_command("PT ACMPA")
+        self.master.apply("[>-<-[>>+<<]        ]")
+        #self.master.apply("[-<->]<[[-]>>+<<]")#[[-]>-<]
         return ""

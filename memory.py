@@ -80,6 +80,20 @@ class ACMPC(Register):
 class ACMPD(Register):
     name = "ACMPD"
 
+class BCMPA(Register):
+    name = "BCMPA"
+
+
+class BCMPB(Register):
+    name = "BCMPB"
+
+
+class BCMPC(Register):
+    name = "BCMPC"
+
+class BCMPD(Register):
+    name = "BCMPD"
+
 
 class IFZ(Register):
     name = "IFZ"
